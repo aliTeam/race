@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>race</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <script src="../three.js/build/three.js"></script>
+    <script src="../three.js/examples/fonts/helvetiker_bold.typeface.js"></script>
+    <script src="../three.js/examples/fonts/helvetiker_regular.typeface.js"></script>
+    <script src="../three.js/examples/js/libs/stats.min.js"></script>
+    <script src="../three.js/examples/js/SkyShader.js"></script>
+    <script src="../three.js/examples/js/shaders/ConvolutionShader.js"></script>
+    <script src="../three.js/examples/js/shaders/CopyShader.js"></script>
+    <script src="../three.js/examples/js/shaders/FXAAShader.js"></script>
+    <script src="../three.js/examples/js/loaders/OBJLoader.js"></script>
+    <script src="../three.js/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="../three.js/examples/js/postprocessing/MaskPass.js"></script>
+    <script src="../three.js/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="../three.js/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="../three.js/examples/js/postprocessing/BloomPass.js"></script>
+    <script src="../three.js/examples/js/renderers/Projector.js"></script>
+    <script src="../three.js/examples/js/renderers/SVGRenderer.js"></script>
+    <script src="../three.js/examples/js/renderers/CanvasRenderer.js"></script>
+    <script src="js/seed.js"></script>
+    <style type="text/css">
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        margin: 0;
+    }
+    
+    .hide {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    }
+    
+    @-webkit-keyframes scale {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.5);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    
+    canvas {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+    
+    .loading {
+        width: 50%;
+        float: left;
+        height: 100%;
+        background: transparent;
+        position: relative;
+        -webkit-transition: all 1s;
+        transition: all 1s;
+        opacity: 1
+    }
+    
+    .loading span {
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        text-align: center;
+        margin-top: -2rem;
+        font-size: 2rem;
+        color: #FFF;
+        text-shadow: -1px -1px 0 #fff, 1px 1px 0 #333, 1px 1px 0 #444;
+        z-index: 10000;
+        -webkit-animation: scale 2s infinite
+    }
+    </style>
+</head>
+
+<body>
+    <p class="loading" id="loading1">
+        <span>Loading</span>
+    </p>
+    <p class="loading" id="loading2">
+        <span>Loading</span>
+    </p>
+</body>
+<script>
+function startWorker() {
+    var worker = new Worker("./js/work.js");
+    worker.postMessage("{flag:true}");
+    worker.onmessage = function(event) {
+        //document.getElementById('loading1').classList.add('hide');
+        //document.getElementById('loading2').classList.add('hide');
+        function NumFlow() {
+            return doNumberFlow(event.data)
+        }
+        process.add([drawGround, drawSky, alibaba, doBuilding, transformCamera, NumFlow, showLogo]);
+    }
+}
+
+function hideLoading() {
+    document.getElementById('loading1').classList.add('hide');
+    document.getElementById('loading2').classList.add('hide');
+}
+
+function start() {
+    process.load('js/define.js')
+        .load('js/alibaba.js')
+        .load('js/motion.js')
+        .load('js/app.js')
+        .load('js/logo.js')
+        .load('js/numberFlow.js')
+        .load('js/transformCamera.js')
+        .load('js/sky.js')
+        .load('js/building.js')
+        .load('js/ground.js')
+        .done(doner)
+
+    function doner() {
+        //document.getElementById('loading').classList.add('hide');
+        container = document.body;
+        initGlobal();
+        bindMotion();
+        startWorker();
+    }
+}
+
+window.onload = start;
+</script>
+
+</html>
